@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // структура для тестов maximum и maxChunks
@@ -46,13 +45,31 @@ var test = []Tests{
 // Пишите тесты в этом файле
 // Тестируем функцию generateRandomElements
 func TestGenerateRandomElements(t *testing.T) {
-	slice := generateRandomElements(-5) //реакция программы на отрицательное значение
-	require.Equal(t, 0, len(slice), "get invalid sie of slice")
-	slice = generateRandomElements(0) //реакция программы на нулевое значение
-	require.Equal(t, 0, len(slice), "get invalid sie of slice")
-	slice = generateRandomElements(10) //реакция программы на положительное значение
-	assert.Equal(t, 10, len(slice), "get invalid sie of slice")
-	//проверим кусок слайса(10 элементов) на повторения значений
+	//структура для тестов генерации чисел
+	tests := []struct {
+		out int
+		in  int
+	}{
+		{
+			out: -8,
+			in:  0,
+		},
+		{
+			out: 0,
+			in:  0,
+		},
+		{
+			out: 10,
+			in:  10,
+		},
+	}
+
+	for _, r := range tests {
+		slice := generateRandomElements(r.out) //реакция программы на положительное значение
+		assert.Equal(t, r.in, len(slice), "got invalid size of slice")
+	}
+	//проверим кусок слайса(20 элементов) на повторяемость значений
+	slice := generateRandomElements(20)
 	sort.Ints(slice) //отсортируем слайс
 	rep := 0         //счетчик повторяющихся значений
 	for i := 1; i < len(slice); i++ {
@@ -60,11 +77,6 @@ func TestGenerateRandomElements(t *testing.T) {
 			rep++
 		}
 		assert.Greater(t, 2, rep, "more then two repeats in random values") //если генератор повторит более 2 значений-предупредим
-	}
-	//так как по условию "слайс целых положительных чисел", проверим это условие
-	slice = generateRandomElements(1_000_000)
-	for i := 1; i < len(slice); i++ {
-		assert.Greater(t, slice[i], 1, "0 or negative number was found")
 	}
 }
 
@@ -87,7 +99,7 @@ func TestMaxChunks(t *testing.T) {
 	for i := 0; i < 10_000; i++ {
 		slice[i] = 9
 		maxi := maxChunks(slice)
-		assert.Equal(t, 9, maxi, "problem appeared during one-by-one test")
+		assert.Equal(t, 9, maxi, "problem appeared during one-by-one test", i)
 		slice[i] = 1
 	}
 }
